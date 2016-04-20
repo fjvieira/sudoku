@@ -57,7 +57,7 @@ Where:
 
 **Response message Example**
 
-***For an invalid board ID (HTTP 400 Status)***
+***For an invalid value in row, column or value (HTTP 422 Status)***
 
 It is a premise to receive just valid values from clients. 
 Just in case, it was added a default validation with a custom message.
