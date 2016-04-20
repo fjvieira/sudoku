@@ -1,4 +1,4 @@
-package com.vieira.sudoku.entity;
+package com.vieira.sudoku.game;
 
 /**
  * Object that represents a error caught by the game algorithm.
@@ -31,6 +31,13 @@ public class WrongMovementError {
 	this.detail = detail;
     }
 
+    /**
+     * Default constructor.
+     */
+    public WrongMovementError(){
+	
+    }
+    
     /**
      * @return the boxErrorType
      */

@@ -1,4 +1,4 @@
-package com.vieira.sudoku.entity;
+package com.vieira.sudoku.game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,9 +47,6 @@ public class SudokuGame {
 	int relativePositionRow = positionRow % 3;
 	int relativePositionColumn = positionColumn % 3;
 
-	if(positionRow == 1 && positionColumn == 4){
-	    System.out.println("ssss");
-	}
 	if (!box.executeMovement(relativePositionRow, relativePositionColumn, value)){
 	    errorList.add(new WrongMovementError(WrongMovementError.BOX_ERROR_TYPE, "Error validating movement in the box", boxNumber));
 	}

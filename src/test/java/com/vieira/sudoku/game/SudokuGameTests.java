@@ -1,4 +1,4 @@
-package com.vieira.sudoku.entity;
+package com.vieira.sudoku.game;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.vieira.sudoku.exception.InvalidDimensionException;
+import com.vieira.sudoku.game.SudokuGame;
 
 /**
  * {@link SudokuGame} class test.
@@ -16,7 +17,7 @@ public class SudokuGameTests {
     
     private static Logger log = Logger.getLogger(SudokuGameTests.class.getSimpleName());
 
-    private SudokuGame sudokuBoard;
+    private SudokuGame sudokuGame;
     
     @Before
     public void constructBoard() throws InvalidDimensionException{
@@ -31,48 +32,48 @@ public class SudokuGameTests {
 	boardArray[7] = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
 	boardArray[8] = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0};
 	
-	sudokuBoard = new SudokuGame(boardArray);
+	sudokuGame = new SudokuGame(boardArray);
     }
     
     @Test
     public void testValidateMovementOnColumn(){
 	//resenting position
-	Assert.assertTrue(sudokuBoard.validateMovementOnColumn(0, 0, 0));
-	Assert.assertTrue(sudokuBoard.validateMovementOnColumn(3, 3, 0));
+	Assert.assertTrue(sudokuGame.validateMovementOnColumn(0, 0, 0));
+	Assert.assertTrue(sudokuGame.validateMovementOnColumn(3, 3, 0));
 	//modifying a already filled position
-	Assert.assertTrue(sudokuBoard.validateMovementOnColumn(0, 0, 1));
+	Assert.assertTrue(sudokuGame.validateMovementOnColumn(0, 0, 1));
 	//Checking if validation from a movement in another column
-	Assert.assertTrue(sudokuBoard.validateMovementOnColumn(1, 1, 1));
+	Assert.assertTrue(sudokuGame.validateMovementOnColumn(1, 1, 1));
 	//Checking a invalid movement.
-	Assert.assertFalse(sudokuBoard.validateMovementOnColumn(1, 0, 1));
+	Assert.assertFalse(sudokuGame.validateMovementOnColumn(1, 0, 1));
     }
     
     @Test
     public void testValidateMovementOnRow(){
 	//resenting position
-	Assert.assertTrue(sudokuBoard.validateMovementOnRow(0, 0, 0));
-	Assert.assertTrue(sudokuBoard.validateMovementOnRow(3, 3, 0));
+	Assert.assertTrue(sudokuGame.validateMovementOnRow(0, 0, 0));
+	Assert.assertTrue(sudokuGame.validateMovementOnRow(3, 3, 0));
 	//modifying a already filled position
-	Assert.assertTrue(sudokuBoard.validateMovementOnRow(0, 1, 2));
+	Assert.assertTrue(sudokuGame.validateMovementOnRow(0, 1, 2));
 	//Checking if validation from a movement in another column
-	Assert.assertTrue(sudokuBoard.validateMovementOnRow(1, 0, 2));
+	Assert.assertTrue(sudokuGame.validateMovementOnRow(1, 0, 2));
 	//Checking a invalid movement.
-	Assert.assertFalse(sudokuBoard.validateMovementOnRow(0, 2, 2));
+	Assert.assertFalse(sudokuGame.validateMovementOnRow(0, 2, 2));
     }
 
     @Test
     public void testGetSudokuBoxNumber() throws InvalidDimensionException{
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(0, 0) == 0);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(2, 2) == 0);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(2, 3) == 1);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(2, 5) == 1);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(1, 6) == 2);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(3, 1) == 3);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(5, 5) == 4);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(4, 7) == 5);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(7, 1) == 6);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(7, 5) == 7);
-	Assert.assertTrue(sudokuBoard.getSudokuBoxNumber(8, 8) == 8);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(0, 0) == 0);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(2, 2) == 0);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(2, 3) == 1);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(2, 5) == 1);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(1, 6) == 2);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(3, 1) == 3);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(5, 5) == 4);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(4, 7) == 5);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(7, 1) == 6);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(7, 5) == 7);
+	Assert.assertTrue(sudokuGame.getSudokuBoxNumber(8, 8) == 8);
     }
     
     @Test
@@ -88,18 +89,18 @@ public class SudokuGameTests {
 	boardArray[7] = new int[]{0, 0, 0, 0, 5, 7, 0, 0, 0};
 	boardArray[8] = new int[]{6, 0, 0, 0, 0, 0, 0, 5, 0};
 	
-	sudokuBoard = new SudokuGame(boardArray);
+	sudokuGame = new SudokuGame(boardArray);
 	
-	Assert.assertTrue(sudokuBoard.executeMovement(0, 0, 7).size() == 0);
-	Assert.assertTrue(sudokuBoard.executeMovement(1, 1, 7).size() == 1);
-	Assert.assertTrue(sudokuBoard.executeMovement(0, 1, 7).size() == 2);
-	Assert.assertTrue(sudokuBoard.executeMovement(1, 0, 7).size() == 2);
+	Assert.assertTrue(sudokuGame.executeMovement(0, 0, 7).size() == 0);
+	Assert.assertTrue(sudokuGame.executeMovement(1, 1, 7).size() == 1);
+	Assert.assertTrue(sudokuGame.executeMovement(0, 1, 7).size() == 2);
+	Assert.assertTrue(sudokuGame.executeMovement(1, 0, 7).size() == 2);
 	
-	Assert.assertTrue(sudokuBoard.executeMovement(8, 8, 5).size() == 3);
+	Assert.assertTrue(sudokuGame.executeMovement(8, 8, 5).size() == 3);
 	
-	Assert.assertTrue(sudokuBoard.executeMovement(1, 1, 2).size() == 0);
-	Assert.assertTrue(sudokuBoard.executeMovement(0, 1, 2).size() == 2);
-	Assert.assertTrue(sudokuBoard.executeMovement(1, 0, 3).size() == 0);
+	Assert.assertTrue(sudokuGame.executeMovement(1, 1, 2).size() == 0);
+	Assert.assertTrue(sudokuGame.executeMovement(0, 1, 2).size() == 2);
+	Assert.assertTrue(sudokuGame.executeMovement(1, 0, 3).size() == 0);
     }
     
     @Test
@@ -125,14 +126,14 @@ public class SudokuGameTests {
 	boardArray[6] = new int[]{9, 0, 7, 4, 0, 0, 0, 0, 0};
 	boardArray[7] = new int[]{0, 0, 0, 0, 5, 7, 0, 0, 0};
 	boardArray[8] = new int[]{6, 0, 0, 0, 0, 0, 0, 5, 0};	
-	sudokuBoard = new SudokuGame(boardArray);
+	sudokuGame = new SudokuGame(boardArray);
 	
 	for (int i = 0; i < solutionArray.length; i++) {
 	    for (int j = 0; j < solutionArray[i].length; j++) {
-		Assert.assertTrue(sudokuBoard.executeMovement(i, j, solutionArray[i][j]).size() == 0);
+		Assert.assertTrue(sudokuGame.executeMovement(i, j, solutionArray[i][j]).size() == 0);
 	    }
 	}
 	
-	Assert.assertTrue(sudokuBoard.checkCompleteSolution());
+	Assert.assertTrue(sudokuGame.checkCompleteSolution());
     }
 }

@@ -1,4 +1,4 @@
-package com.vieira.sudoku.entity;
+package com.vieira.sudoku.game;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import com.vieira.sudoku.exception.InvalidBoxException;
 import com.vieira.sudoku.exception.InvalidDimensionException;
+import com.vieira.sudoku.game.SudokuBox;
 
 /**
  * {@link SudokuBox} class test.
