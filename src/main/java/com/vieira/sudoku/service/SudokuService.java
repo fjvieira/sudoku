@@ -1,5 +1,7 @@
 package com.vieira.sudoku.service;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,6 +35,10 @@ import com.vieira.sudoku.service.data.SudokuBoardMovementResult;
 public class SudokuService {
     //Cache timeout in minutes
     private static final int CACHE_TIMEOUT = 3600;
+    
+    private static String ERROR_TYPE = "type";
+    
+    private static String ERROR_MESSAGE = "message";
     
     private static final Logger LOG = LoggerFactory.getLogger(SudokuService.class);
     
@@ -60,11 +67,17 @@ public class SudokuService {
      * @return {@link SudokuBoardMovementResult} for a movement in a valid board (HTTP 201) or Board Not found (HTTP 404). 
      */
     @RequestMapping(method={RequestMethod.PUT})
-    public ResponseEntity<?> executeMovement(@RequestBody SudokuBoardMovement movement) {
+    public ResponseEntity<?> executeMovement(@RequestBody @Valid SudokuBoardMovement movement) {
 	
 	SudokuBoard board = cache.get(movement.getId());
 	if (board == null) {
-	    return new ResponseEntity<String>("Board ID not found.", HttpStatus.NOT_FOUND);
+
+	    ModelMap map = new ModelMap();
+	    map.addAttribute(ERROR_TYPE, "not_found");
+	    map.addAttribute(ERROR_MESSAGE, "Board ID not found.");
+
+	    return new ResponseEntity<ModelMap>(map, HttpStatus.NOT_FOUND);
+	    
 	}
 	
 	SudokuBoardMovementResult result = new SudokuBoardMovementResult();	

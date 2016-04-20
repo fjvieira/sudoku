@@ -57,9 +57,25 @@ Where:
 
 **Response message Example**
 
+***For an invalid board ID (HTTP 400 Status)***
+
+It is a premise to receive just valid values from clients. 
+Just in case, it was added a default validation with a custom message.
+
+	{
+		"type": "validation_error",
+		"message": "The message contain errors.",
+		"fields": {
+			"value": "must be lower or equal to 9"
+		}
+	}
+
 ***For an invalid board ID (HTTP 404 Status)***
 
-    Board ID not found.
+	{
+		"type": "not_found",
+		"message": "Board ID not found."
+	}
 
 
 ***For a valid board ID (HTTP 200 Status)***

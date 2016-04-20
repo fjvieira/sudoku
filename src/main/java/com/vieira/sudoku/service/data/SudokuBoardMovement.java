@@ -1,5 +1,11 @@
 package com.vieira.sudoku.service.data;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+
+
 /**
  * Representation of a movement in an active board.
  * @author Fernando Jose Vieira
@@ -7,12 +13,22 @@ package com.vieira.sudoku.service.data;
  */
 public class SudokuBoardMovement {
 
+    @NotNull
     private String id;
-    
+
+    @NotNull
+    @Min(0)
+    @Max(8)    
     private int row;
-    
+
+    @NotNull
+    @Min(0)
+    @Max(8)
     private int column;
-    
+
+    @NotNull
+    @Min(0)
+    @Max(9)
     private int value;
     
     /**
