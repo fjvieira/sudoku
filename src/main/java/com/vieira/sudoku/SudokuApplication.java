@@ -1,8 +1,7 @@
 package com.vieira.sudoku;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
 
 /**
  * Application Initializer.
@@ -10,18 +9,11 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
  *
  */
 @SpringBootApplication
-public class SudokuApplication extends SpringBootServletInitializer {
-
-    @Override
-    protected SpringApplicationBuilder configure(
-	    SpringApplicationBuilder application) {
-
-	return application.sources(SudokuApplication.class);
-    }
+public class SudokuApplication {
 
     public static void main(String[] args) {
-	new SudokuApplication().configure(
-		new SpringApplicationBuilder(SudokuApplication.class)).run(args);
+        SpringApplication.run(SudokuApplication.class, args);
 
     }
+    
 }

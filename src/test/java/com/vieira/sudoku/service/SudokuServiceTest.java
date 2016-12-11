@@ -1,145 +1,132 @@
 package com.vieira.sudoku.service;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
-import com.vieira.sudoku.SudokuApplication;
-import com.vieira.sudoku.exception.InvalidDimensionException;
-import com.vieira.sudoku.game.SudokuGame;
-import com.vieira.sudoku.service.data.SudokuBoard;
+import com.google.gson.Gson;
 import com.vieira.sudoku.service.data.SudokuBoardMovement;
 import com.vieira.sudoku.service.data.SudokuBoardMovementResult;
+import com.vieira.sudoku.service.data.SudokuGameSession;
 
 /**
  * Rest Service integration test.
+ * 
  * @author Fernando Jose Vieira
  *
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes=SudokuApplication.class)
-@WebIntegrationTest(randomPort = true)
+@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
+@SpringBootTest
 public class SudokuServiceTest {
-    
-    @Value("${local.server.port}")
-    private int port;
-    
-    private RestTemplate restTemplate = new TestRestTemplate();
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    private SudokuGameSession getGameBoard() throws Exception {
+        MvcResult result = mockMvc.perform(get(SudokuService.URI_CONTEXT).contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        return new Gson().fromJson(result.getResponse().getContentAsString(), SudokuGameSession.class);
+    }
 
     /**
-     * @param isJerseyAPI
-     * @return
-     */
-    private String getURL(){
-	StringBuilder url = new StringBuilder("http://localhost:");
-	url.append(port).append("/game/");
-	return url.toString();
-    }
-    
-    private ResponseEntity<SudokuBoard> getGameBoard() {
-	return restTemplate.exchange(getURL(),HttpMethod.GET, null, SudokuBoard.class);
-    }
-    
-    /**
+     * @throws Exception
      * 
      */
     @Test
-    public void testGetGameBoard() {
-	ResponseEntity<SudokuBoard> response = getGameBoard();
-	
-	Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
-	Assert.assertNotNull(response.getBody().getId());
-	Assert.assertTrue(response.getBody().getBoard() instanceof int[][]);
+    public void testGetGameBoard() throws Exception {
+        mockMvc.perform(get(SudokuService.URI_CONTEXT).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").isNotEmpty())
+                .andExpect(jsonPath("board").isArray());
     }
 
     @Test
-    public void testExecuteMovements() {
-	ResponseEntity<SudokuBoard> response = getGameBoard();
+    public void testExecuteMovements() throws Exception {
+        SudokuGameSession gameSession = getGameBoard();
 
-	String boardId = response.getBody().getId();
-	int[][] boardArray = response.getBody().getBoard();
-	
-	
-	HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-	
-	HttpEntity<SudokuBoardMovement> request = null;
-	
-	SudokuBoardMovement movement = new SudokuBoardMovement(boardId, 0, 0, 7);
-	request = new HttpEntity<SudokuBoardMovement>(movement, httpHeaders);
-	ResponseEntity<SudokuBoardMovementResult> movementResponse = 
-		restTemplate.exchange(getURL(),HttpMethod.PUT, request, SudokuBoardMovementResult.class);
-	Assert.assertTrue(movementResponse.getBody().getErrors().isEmpty());
-	
-	movement = new SudokuBoardMovement(boardId, 1, 0, 7);
-	request = new HttpEntity<SudokuBoardMovement>(movement, httpHeaders);
-	movementResponse = 
-		restTemplate.exchange(getURL(),HttpMethod.PUT, request, SudokuBoardMovementResult.class);
-	Assert.assertFalse(movementResponse.getBody().getErrors().isEmpty());
+        SudokuBoardMovement movement = new SudokuBoardMovement(0, 0, 7);
+        
+        mockMvc.perform(put(SudokuService.URI_CONTEXT + "/{gameSessionID}", gameSession.getId())
+                .content(new Gson().toJson(movement))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("completed").value(false))
+                .andExpect(jsonPath("valid").value(true))
+                .andExpect(jsonPath("errors").isEmpty());
+
+        movement = new SudokuBoardMovement(1, 0, 7);
+
+        mockMvc.perform(put(SudokuService.URI_CONTEXT + "/{gameSessionID}", gameSession.getId())
+                .content(new Gson().toJson(movement))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("completed").value(false))
+                .andExpect(jsonPath("valid").value(false))
+                .andExpect(jsonPath("errors").isNotEmpty());
 
     }
 
     @Test
-    public void testInvalidBoardId() {
-	HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);	
-	SudokuBoardMovement movement = new SudokuBoardMovement("12121212", 0, 0, 7);
-	HttpEntity<SudokuBoardMovement> request = new HttpEntity<SudokuBoardMovement>(movement, httpHeaders);
-	ResponseEntity<String> movementResponse = 
-		restTemplate.exchange(getURL(),HttpMethod.PUT, request, String.class);
-	Assert.assertEquals(movementResponse.getStatusCode(), HttpStatus.NOT_FOUND);
+    public void testInvalidBoardId() throws Exception {
+        SudokuBoardMovement movement = new SudokuBoardMovement(0, 0, 7);
+        
+        mockMvc.perform(put(SudokuService.URI_CONTEXT + "/{gameSessionID}", "23233")
+                .content(new Gson().toJson(movement))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+        
     }
-    
-    
+
     @Test
-    public void testCheckCompleteSolution() throws InvalidDimensionException {
-	int[][] solutionArray = new int[9][];
-	solutionArray[0] = new int[]{7, 9, 2, 1, 4, 6, 5, 3, 8};
-	solutionArray[1] = new int[]{4, 6, 5, 2, 3, 8, 7, 1, 9};
-	solutionArray[2] = new int[]{3, 1, 8, 5, 7, 9, 6, 4, 2};
-	solutionArray[3] = new int[]{5, 3, 9, 8, 6, 4, 2, 7, 1};
-	solutionArray[4] = new int[]{2, 7, 6, 9, 1, 3, 4, 8, 5};
-	solutionArray[5] = new int[]{8, 4, 1, 7, 2, 5, 9, 6, 3};
-	solutionArray[6] = new int[]{9, 5, 7, 4, 8, 1, 3, 2, 6};
-	solutionArray[7] = new int[]{1, 2, 3, 6, 5, 7, 8, 9, 4};
-	solutionArray[8] = new int[]{6, 8, 4, 3, 9, 2, 1, 5, 7};	
-	
-	ResponseEntity<SudokuBoard> response = getGameBoard();
+    public void testCheckCompleteSolution() throws Exception {
+        int[][] solutionArray = new int[9][];
+        solutionArray[0] = new int[] { 7, 9, 2, 1, 4, 6, 5, 3, 8 };
+        solutionArray[1] = new int[] { 4, 6, 5, 2, 3, 8, 7, 1, 9 };
+        solutionArray[2] = new int[] { 3, 1, 8, 5, 7, 9, 6, 4, 2 };
+        solutionArray[3] = new int[] { 5, 3, 9, 8, 6, 4, 2, 7, 1 };
+        solutionArray[4] = new int[] { 2, 7, 6, 9, 1, 3, 4, 8, 5 };
+        solutionArray[5] = new int[] { 8, 4, 1, 7, 2, 5, 9, 6, 3 };
+        solutionArray[6] = new int[] { 9, 5, 7, 4, 8, 1, 3, 2, 6 };
+        solutionArray[7] = new int[] { 1, 2, 3, 6, 5, 7, 8, 9, 4 };
+        solutionArray[8] = new int[] { 6, 8, 4, 3, 9, 2, 1, 5, 7 };
 
-	String boardId = response.getBody().getId();
-	int[][] boardArray = response.getBody().getBoard();
-	
-	
-	HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-	
-	HttpEntity<SudokuBoardMovement> request = null;
-	ResponseEntity<SudokuBoardMovementResult> movementResponse =  null;
-	
-	for (int i = 0; i < solutionArray.length; i++) {
-	    for (int j = 0; j < solutionArray[i].length; j++) {
-		SudokuBoardMovement movement = new SudokuBoardMovement(boardId, i, j, solutionArray[i][j]);
-		request = new HttpEntity<SudokuBoardMovement>(movement, httpHeaders);
-		movementResponse = restTemplate
-			.exchange(getURL(),HttpMethod.PUT, request, SudokuBoardMovementResult.class);
-		Assert.assertTrue(movementResponse.getBody().getErrors().isEmpty());
+        String gameSessionId = getGameBoard().getId();
 
-	    }
-	}
-	
-	Assert.assertTrue(movementResponse.getBody().isCompleted());
+        MvcResult result = null;
+        Gson gson = new Gson();
+        
+        for (int i = 0; i < solutionArray.length; i++) {
+            for (int j = 0; j < solutionArray[i].length; j++) {
+                SudokuBoardMovement movement = new SudokuBoardMovement(i, j, solutionArray[i][j]);
+                
+                result = mockMvc.perform(put(SudokuService.URI_CONTEXT + "/{gameSessionID}", gameSessionId)
+                        .content(gson.toJson(movement))
+                        .contentType(MediaType.APPLICATION_JSON))
+                        .andExpect(jsonPath("valid").value(true))
+                        .andExpect(jsonPath("errors").isEmpty())
+                        .andReturn();
+                
+            }
+        }
+
+        SudokuBoardMovementResult movementResult = gson.fromJson(result.getResponse().getContentAsString(), SudokuBoardMovementResult.class);
+        
+        Assert.assertTrue(movementResult.isCompleted());
     }
-    
+
 }

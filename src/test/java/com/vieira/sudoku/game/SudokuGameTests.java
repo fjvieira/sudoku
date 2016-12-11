@@ -1,12 +1,10 @@
 package com.vieira.sudoku.game;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.vieira.sudoku.exception.InvalidDimensionException;
-import com.vieira.sudoku.game.SudokuGame;
 
 /**
  * {@link SudokuGame} class test.
@@ -14,8 +12,6 @@ import com.vieira.sudoku.game.SudokuGame;
  *
  */
 public class SudokuGameTests {
-    
-    private static Logger log = Logger.getLogger(SudokuGameTests.class.getSimpleName());
 
     private SudokuGame sudokuGame;
     

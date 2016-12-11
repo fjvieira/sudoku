@@ -1,12 +1,10 @@
 package com.vieira.sudoku.game;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.vieira.sudoku.exception.InvalidBoxException;
 import com.vieira.sudoku.exception.InvalidDimensionException;
-import com.vieira.sudoku.game.SudokuBox;
 
 /**
  * {@link SudokuBox} class test.
@@ -14,8 +12,6 @@ import com.vieira.sudoku.game.SudokuBox;
  *
  */
 public class SudokuBoxTests {
-
-    private static Logger log = Logger.getLogger(SudokuBoxTests.class.getSimpleName());
 
     @Test
     public void testCheckBoxCompleteCorrectness() throws InvalidBoxException, InvalidDimensionException {
@@ -30,7 +26,7 @@ public class SudokuBoxTests {
 	boxArray[2] = new int[] {1,2,3};
 	boxArray[0] = new int[] {7,8,9};
 	Assert.assertTrue(box.checkCompleteCorrectness(boxArray));
-	//test a incorrect but complet box.
+	//test a incorrect but complete box.
 	boxArray[0] = new int[] {1,9,3};
 	Assert.assertFalse(box.checkCompleteCorrectness(boxArray));
 	//test a incomplete box.

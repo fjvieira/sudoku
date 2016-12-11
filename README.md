@@ -1,6 +1,6 @@
 # Sudoku API
 
-Sudoku API is Sudoku game algorithm app constructed to enable multiple clients to interact simultaneously with the server. 
+Sudoku API is a Sudoku game algorithm app constructed to enable multiple clients to interact simultaneously with the server. 
 Main functionalities:
 
   - Sudoku board (9x9 board) and board ID generation;
@@ -14,21 +14,21 @@ Main functionalities:
 
 In order to implement the Sudoku algorithm, it was assumed:
 
-  - Sudoku board will be not generated ( it will be one board version in the first version);
-  - The client will always send valid values of row, colum and value;
+  - Sudoku board will be not generated (it will be one board version in the first version);
+  - The client will always send valid values of row, column and value;
   - Value is a number between 1 and 9. Zero means empty.
   - The value 0 means a empty position in Sudoku table;
   - It is possible to setting a column as empty (sending 0 as a value);
-  - Row is a zero based index;
-  - Column is a zero based index;
+  - Row is zero based indexed;
+  - Column is zero based indexed;
 
 ## Services
 
-The services are avaliable thought the /game relative URL.
+The services are available thought the /game relative URL.
 
 ##### GET
 
-Send a GET request will result in a response with a new Sudoku boards that contains the array representing the game and the board ID.
+Send a GET request in /game will result in a response with a new Sudoku boards that contains the array representing the game and the board ID.
 
 **Response message example**
 
@@ -39,19 +39,18 @@ Send a GET request will result in a response with a new Sudoku boards that conta
 
 ##### PUT
 
-Send a PUT request will be understood as a movement. A movement consists of a position (row and column), a value and a valid Board ID.
+Send a PUT request in /game/{id} will be understood as a movement. A movement consists of a position (row and column), a value and a valid game session ID.
 
 **Request message Example**
 
     {
-        "id":"8e0e0839-5f61-481e-8a7f-c28da6be55ea",
         "row": 1,
         "column": 1,
         "value" : 1
     }
 
 Where: 
-- id is the Board ID;
+- id is the game session ID;
 - row is the row position (zero based index);
 - column is the column position (zero based index);
 
@@ -70,11 +69,11 @@ Just in case, it was added a default validation with a custom message.
 		}
 	}
 
-***For an invalid board ID (HTTP 404 Status)***
+***For an invalid game session ID (HTTP 404 Status)***
 
 	{
 		"type": "not_found",
-		"message": "Board ID not found."
+		"message": "Game session ID not found."
 	}
 
 
@@ -97,11 +96,12 @@ Where:
 - Valid is a flag indicating if the movement was valid;
 - Error is a array of movement validation errors. An error object can be understood in the following table.
 
-    | Type | Meaning | Detail |
-    |------|--------|---|
-    | 0 | Error in the 3x3 Box | Box number (zero based index) |
-    | 1 | Error in the row | Row number |
-    | 2 | Error in the column | Column number |
+
+| Type | Meaning | Detail |
+|---|---|---|
+| 0 | Error in the 3x3 Box | Box number (zero based index) |
+| 1 | Error in the row | Row number |
+| 2 | Error in the column | Column number |
 
 
 ## Tech
@@ -115,7 +115,7 @@ It was used the following technologies:
 * JUnit
 
 
-### Bulding and packging
+### Bulding and packaging
 
 You will need Maven to build this project. You can build the package using the following command on the project root directory:
 
@@ -129,7 +129,7 @@ The first one is for running it through Maven:
 
     mvn spring-boot:run
 
-The second one is for running the jar package (located in the target directory after a packging) directly:
+The second one is for running the jar package (located in the target directory after a packaging) directly:
 
     java -jar sudoku-1.0.0.jar
 
